@@ -1,0 +1,83 @@
+version: '3'
+
+services:
+    jenkins:
+        build: ./jenkins
+        image: appstizer-jenkins
+        container_name: jenkins
+        restart: unless-stopped
+        ports:
+            - '8080:8080'
+            - '50000:50000'
+        volumes:
+            - ./storage/jenkins:/var/jenkins_home
+    gogs:
+        image: gogs/gogs
+        container_name: gogs
+        restart: unless-stopped
+        ports:
+            - '8081:3000'
+            - '10022:22'
+        volumes:
+            - ./storage/gogs:/data
+    askbot:
+        build: ./askbot
+        image: appstizer-askbot
+        container_name: askbot
+        restart: unless-stopped
+        ports:
+            - '8082:80'
+        volumes:
+            - ./storage/askbot:/data
+    rocketchat:
+        image: rocket.chat
+        container_name: rocketchat
+        restart: unless-stopped
+        depends_on:
+            - mongo
+        ports:
+            - '8083:3000'
+        volumes:
+            - ./storage/rocketchat:/app/uploads
+        environment:
+            - ROOT_URL=http://localhost:8083
+            - MONGO_URL=mongodb://mongo:27017/meteor
+    mongo:
+        image: mongo
+        container_name: mongo
+        restart: unless-stopped
+        volumes:
+            - ./storage/mongo/data/db:/data/db
+            - ./storage/mongo/data/configdb:/data/configdb
+    peach:
+        image: peachdocs/peach
+        container_name: peach
+        restart: unless-stopped
+        ports:
+            - '8084:5555'
+        volumes:
+            - ./storage/peach:/data/peach
+    gitpitch:
+        image: knsit/gitpitch
+        container_name: gitpitch
+        restart: unless-stopped
+        ports:
+            - '8085:9000'
+        environment:
+            - "GP_GOGS_BASE=http://gogs:3000"
+            - "GP_GOGS_API=http://gogs:3000/api/v1/"
+            - "GP_GOGS_AS_DEFAULT=true"
+    drawio:
+        image: fjudith/draw.io
+        container_name: drawio
+        restart: unless-stopped
+        ports:
+            - '8086:8080'
+    ghost:
+        image: ghost:1-alpine
+        container_name: ghost
+        restart: unless-stopped
+        ports:
+            - '2368:2368'
+        volumes:
+            - ./storage/ghost:/var/lib/ghost/content

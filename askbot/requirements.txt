@@ -1,0 +1,4 @@
+six==1.10.0
+askbot==0.7.58
+uWSGI==2.0.17
+wsgiref==0.1.2
